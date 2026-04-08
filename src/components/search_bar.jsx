@@ -1,0 +1,170 @@
+import { useRef } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { isEmpty } from "./../state/emptyslice";
+import { setPhotoArray, clearPhotos } from "../state/photoslice";
+import React, { useMemo, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { setInpName } from "./../state/searchnamesclice";
+import { isLoading } from "../state/photosloadingsclice";
+import { setSuggArray, clearSugg } from "../state/suggslice";
+import { setText, clearText } from "../state/inputtextslice";
+import { resetPageNum } from "../state/booleanslice";
+
+function debounce(func, timeout = 300) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func.apply(this, args);
+    }, timeout);
+  };
+}
+
+function SearchBar() {
+  const empty = useSelector((state) => state.empState.value);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const inputQuery = useRef(null);
+  const arrayOfSugg = useSelector((state) => state.sugg.suggArray);
+  const inpText = useSelector((state) => state.text.value);
+
+  const debouncedLog = useMemo(
+    () =>
+      debounce(async (val) => {
+        try {
+          const response = await axios.get(
+            `http://localhost:5000/api/sugg/${val}`
+          );
+          const array = response.data.suggArray;
+
+          dispatch(setSuggArray(array));
+        } catch (error) {
+          console.error("Unable to get backend message:", error);
+        }
+      }, 300),
+    []
+  );
+
+  async function search() {
+    var searchValue = "";
+
+    if (inputQuery.current) {
+      if (inputQuery.current.value !== "") {
+        dispatch(resetPageNum());
+        const perPage = 20;
+        const Page = 1;
+        dispatch(isEmpty(false));
+        searchValue = inputQuery.current.value;
+        dispatch(setInpName(searchValue));
+
+        console.log(searchValue);
+        try {
+          dispatch(clearText());
+          dispatch(clearPhotos());
+          dispatch(isLoading(true));
+          navigate(`/results/${searchValue}`);
+
+          const response = await axios.get(`http://localhost:5000/api/photo`, {
+            params: {
+              searchValue: searchValue,
+              perPage: perPage,
+              Page: Page,
+            },
+          });
+          const array = response.data.photosArray;
+          dispatch(setPhotoArray(array));
+          dispatch(isLoading(false));
+        } catch (error) {
+          console.error("Unable to get backend message:", error);
+        }
+      } else {
+        dispatch(isEmpty(true));
+        setTimeout(() => {
+          dispatch(isEmpty(false));
+        }, 5000);
+      }
+    }
+  }
+
+  async function auto(e) {
+    const { type, value } = e.target;
+    dispatch(setText(value));
+    if (type === "text" && value.length > 2) {
+      console.log(value);
+      debouncedLog(value);
+    } else {
+      dispatch(clearSugg());
+    }
+  }
+
+  async function querySugg(e) {
+    if (e.target.innerText) {
+      dispatch(resetPageNum());
+      const perPage = 20;
+      const Page = 1;
+      const searchValue = e.target.innerText;
+      dispatch(setInpName(searchValue));
+
+      console.log(searchValue);
+      try {
+        dispatch(clearText());
+        dispatch(clearPhotos());
+        dispatch(isLoading(true));
+        navigate(`/results/${searchValue}`);
+
+        const response = await axios.get(`http://localhost:5000/api/photo`, {
+          params: {
+            searchValue: searchValue,
+            perPage: perPage,
+            Page: Page,
+          },
+        });
+        const array = response.data.photosArray;
+        dispatch(setPhotoArray(array));
+        dispatch(isLoading(false));
+      } catch (error) {
+        console.error("Unable to get backend message:", error);
+      }
+    }
+  }
+
+  return (
+    <div className="search-box g">
+      <input
+        onChange={auto}
+        ref={inputQuery}
+        className="search-bnt g1"
+        placeholder="Search any image"
+        type="text"
+        name="search"
+        id=""
+        value={inpText}
+      />
+      <div className="s-bnt">
+        <button onClick={search} type="button" className="ss-bnt">
+          S
+        </button>
+      </div>
+      <div className={empty ? "artl artl1" : "artl"}>
+        <p className="alrt-message">Input Required</p>
+      </div>
+      <div className="sugg">
+        {arrayOfSugg.map((sugg, index) => {
+          return (
+            <div
+              className="sugg-itm"
+              onClick={querySugg}
+              key={index}
+              id={index}
+            >
+              {sugg}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+export default SearchBar;
