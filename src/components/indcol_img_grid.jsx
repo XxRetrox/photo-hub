@@ -2,9 +2,10 @@ import Masonry from "react-masonry-css";
 import { useSelector } from "react-redux";
 import IndColImgCard from "./indcol_image_card";
 const breakpointColumsObj = {
-  default: 5,
-  800: 3,
-  500: 2,
+  default: 4,
+  1100: 3,
+  700: 2,
+  500: 1,
 };
 
 function IndColGrid(props) {

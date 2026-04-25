@@ -34,7 +34,7 @@ function HomeBody() {
       debounce(async (val) => {
         try {
           const response = await axios.get(
-            `http://localhost:5000/api/sugg/${val}`
+            `${import.meta.env.VITE_API_URL}/api/sugg/${val}`
           );
           const array = response.data.suggArray;
 
@@ -52,32 +52,17 @@ function HomeBody() {
     if (inputQuery.current) {
       if (inputQuery.current.value !== "") {
         dispatch(resetPageNum());
-        const perPage = 20;
-        const Page = 1;
+
         dispatch(isEmpty(false));
         searchValue = inputQuery.current.value;
         dispatch(setInpName(searchValue));
+        dispatch(clearText());
+        dispatch(clearSugg());
+        dispatch(clearPhotos());
+        dispatch(isLoading(true));
+        navigate(`/results/${searchValue}`);
 
         console.log(searchValue);
-        try {
-          dispatch(clearText());
-          dispatch(clearPhotos());
-          dispatch(isLoading(true));
-          navigate(`/results/${searchValue}`);
-
-          const response = await axios.get(`http://localhost:5000/api/photo`, {
-            params: {
-              searchValue: searchValue,
-              perPage: perPage,
-              Page: Page,
-            },
-          });
-          const array = response.data.photosArray;
-          dispatch(setPhotoArray(array));
-          dispatch(isLoading(false));
-        } catch (error) {
-          console.error("Unable to get backend message:", error);
-        }
       } else {
         dispatch(isEmpty(true));
         setTimeout(() => {
@@ -101,31 +86,16 @@ function HomeBody() {
   async function querySugg(e) {
     if (e.target.innerText) {
       dispatch(resetPageNum());
-      const perPage = 20;
-      const Page = 1;
+
       const searchValue = e.target.innerText;
       dispatch(setInpName(searchValue));
+      dispatch(clearText());
+      dispatch(clearSugg());
+      dispatch(clearPhotos());
+      dispatch(isLoading(true));
+      navigate(`/results/${searchValue}`);
 
       console.log(searchValue);
-      try {
-        dispatch(clearText());
-        dispatch(clearPhotos());
-        dispatch(isLoading(true));
-        navigate(`/results/${searchValue}`);
-
-        const response = await axios.get(`http://localhost:5000/api/photo`, {
-          params: {
-            searchValue: searchValue,
-            perPage: perPage,
-            Page: Page,
-          },
-        });
-        const array = response.data.photosArray;
-        dispatch(setPhotoArray(array));
-        dispatch(isLoading(false));
-      } catch (error) {
-        console.error("Unable to get backend message:", error);
-      }
     }
   }
 
@@ -147,6 +117,7 @@ function HomeBody() {
           id=""
           onChange={auto}
           value={inpText}
+          autoComplete="off"
         />
         <div className="s-bnt">
           <button onClick={search} type="button" className="ss-bnt">

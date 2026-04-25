@@ -4,6 +4,7 @@ import {
   setSearchedColl,
   setImageColl,
   setAction,
+  setRevCollArray,
 } from "../state/collslice";
 import {
   isTrue,
@@ -16,6 +17,7 @@ import CollList from "./coll-list";
 import InputSearch from "./imput";
 import { setInputColText } from "../state/inputtextslice";
 import Notification from "./notification";
+import { useRef } from "react";
 
 function AddPopUp(params) {
   const dispatch = useDispatch();
@@ -24,6 +26,7 @@ function AddPopUp(params) {
   const coll = useSelector((state) => state.collection.collArray);
   const photo = useSelector((state) => state.img.ImgArray);
   const show = useSelector((state) => state.boolean.value3);
+  const notificationTimer = useRef(null);
   const photoIndex = useSelector((state) => state.index.value);
 
   function hide() {
@@ -34,6 +37,9 @@ function AddPopUp(params) {
 
   const addColl = async (id, col) => {
     console.log("clicked");
+    if (notificationTimer.current) {
+      clearTimeout(notificationTimer.current);
+    }
     if (id && col) {
       const collId = id;
       const collName = col;
@@ -43,22 +49,31 @@ function AddPopUp(params) {
       dispatch(setAction("added to"));
 
       try {
-        const response = await axios.post("http://localhost:5000/api/imgcoll", {
-          collId: collId,
-          collName: collName,
-          imgId: photo.id,
-          imgUrl: photo.urls.small,
-          imgH: photo.height,
-          imgW: photo.width,
-        });
+        const response = await axios.post(
+          `${import.meta.env.VITE_API_URL}/api/imgcoll`,
+          {
+            collId: collId,
+            collName: collName,
+            imgId: photo.id,
+            imgUrl: photo.urls.small,
+            imgH: photo.height,
+            imgW: photo.width,
+          }
+        );
 
         const arrColl = response.data.collArray;
+        const imgArrColl = response.data.imgColArray;
         dispatch(setCollArray(arrColl));
+        dispatch(setRevCollArray(imgArrColl));
         const result = arrColl.filter((item) =>
           item.collection.toLowerCase().includes(inp.toLowerCase())
         );
         dispatch(setSearchedColl(result));
         dispatch(setShowNotify(true));
+        notificationTimer.current = setTimeout(() => {
+          dispatch(setShowNotify(false));
+          notificationTimer.current = null;
+        }, 3000);
       } catch (error) {
         console.error("Error adding image to collection:", error);
       }

@@ -11,7 +11,7 @@ import { setIndex } from "../state/imgindexslice";
 import { setCollArray } from "../state/collslice";
 import { clearImages, setImageArray } from "../state/relatedimageslice";
 
-const API_KEY = "awMXFC3RsKaQ3nNjELoXXh9XFJbZMnTSrSw7IVzdJj0";
+const API_KEY = import.meta.env.VITE_UNSPLASH_API_KEY;
 
 const ImgCard = forwardRef((props, forwardedRef) => {
   const loading = useSelector((state) => state.load.value);
@@ -48,7 +48,7 @@ const ImgCard = forwardRef((props, forwardedRef) => {
           dispatch(isLoading(true));
           navigate(`/image/${imgID}`);
           const response = await axios.get(
-            `http://localhost:5000/api/image/${imgID}`
+            `${import.meta.env.VITE_API_URL}/api/image/${imgID}`
           );
 
           const imgArray = response.data.imgArray;
@@ -59,13 +59,16 @@ const ImgCard = forwardRef((props, forwardedRef) => {
 
           const searchValue = imgArray.tags[0].title;
           console.log(searchValue, "image summary");
-          const response1 = await axios.get(`http://localhost:5000/api/photo`, {
-            params: {
-              searchValue: searchValue,
-              perPage: perPage,
-              Page: Page,
-            },
-          });
+          const response1 = await axios.get(
+            `${import.meta.env.VITE_API_URL}/api/photo`,
+            {
+              params: {
+                searchValue: searchValue,
+                perPage: perPage,
+                Page: Page,
+              },
+            }
+          );
           dispatch(isLoading(false));
           const array = response1.data.photosArray;
           dispatch(setImageArray(array));
@@ -122,7 +125,7 @@ const ImgCard = forwardRef((props, forwardedRef) => {
 
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/coll/${imgId}`
+        `${import.meta.env.VITE_API_URL}/api/coll/${imgId}`
       );
       const collArray = response.data.collArray;
       dispatch(setCollArray(collArray));

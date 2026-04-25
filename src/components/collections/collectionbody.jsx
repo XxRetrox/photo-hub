@@ -21,7 +21,9 @@ function CollectionBody() {
   useEffect(() => {
     async function onLoad() {
       try {
-        const response = await axios.get("http://localhost:5000/api/collname");
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/collname`
+        );
         const array = response.data.collArray;
         dispatch(setCol(array));
       } catch (error) {

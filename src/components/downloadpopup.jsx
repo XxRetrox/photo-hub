@@ -33,40 +33,42 @@ function DownloadPopup(params) {
 
   return (
     <div className={show ? "fixed-bot" : "slide"}>
-      <div className="x-button" onClick={hide}>
-        <p>X</p>
-      </div>
-      <div className="content">
-        <h5 className="sub-head">
-          <strong>Thanks for downloading!</strong> 😁 do not forget to support
-          the creator's work by clicking on their socials to appreciate their
-          works and share with others.
-        </h5>
-        <div className="socials">
-          {socials.instagram_username !== null ? (
-            <div id="insta" className="links" onClick={redir}>
-              <div className="social-logo insta"></div>
-              <div>
-                <p className="logo-text">{socials.instagram_username}</p>
+      <div className="wra">
+        <div className="x-button" onClick={hide}>
+          <p>X</p>
+        </div>
+        <div className="content">
+          <h5 className="sub-head">
+            <strong>Thanks for downloading!</strong> 😁 do not forget to support
+            the creator's work by clicking on their socials to appreciate their
+            works and share with others.
+          </h5>
+          <div className="socials">
+            {socials.instagram_username !== null ? (
+              <div id="insta" className="links" onClick={redir}>
+                <div className="social-logo insta"></div>
+                <div>
+                  <p className="logo-text">{socials.instagram_username}</p>
+                </div>
               </div>
-            </div>
-          ) : null}
-          {socials.portfolio_url !== null ? (
-            <div id="portfolio" className="links" onClick={redir}>
-              <div className="social-logo port"></div>
-              <div>
-                <p className="logo-text">{socials.portfolio_url}</p>
+            ) : null}
+            {socials.portfolio_url !== null ? (
+              <div id="portfolio" className="links" onClick={redir}>
+                <div className="social-logo port"></div>
+                <div>
+                  <p className="logo-text">{socials.portfolio_url}</p>
+                </div>
               </div>
-            </div>
-          ) : null}
-          {socials.twitter_username !== null ? (
-            <div id="x" className="links" onClick={redir}>
-              <div className="social-logo x"></div>
-              <div>
-                <p className="logo-text">{socials.twitter_username}</p>
+            ) : null}
+            {socials.twitter_username !== null ? (
+              <div id="x" className="links" onClick={redir}>
+                <div className="social-logo x"></div>
+                <div>
+                  <p className="logo-text">{socials.twitter_username}</p>
+                </div>
               </div>
-            </div>
-          ) : null}
+            ) : null}
+          </div>
         </div>
       </div>
     </div>

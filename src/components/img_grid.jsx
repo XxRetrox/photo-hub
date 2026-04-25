@@ -3,9 +3,10 @@ import { useSelector } from "react-redux";
 import ImgCard from "./image_card";
 
 const breakpointColumsObj = {
-  default: 5,
-  800: 3,
-  500: 2,
+  default: 4,
+  1100: 3,
+  700: 2,
+  500: 1,
 };
 
 function ImgGrid(props) {

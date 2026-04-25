@@ -7,9 +7,9 @@ function Notification() {
   const colname = useSelector((state) => state.collection.imageColl);
   const actname = useSelector((state) => state.collection.action);
 
-  setTimeout(() => {
-    dispatch(setShowNotify(false));
-  }, 2300);
+  // setTimeout(() => {
+  //   dispatch(setShowNotify(false));
+  // }, 2300);
 
   return (
     <div className={show ? "notify-con scale" : "notify-con"}>

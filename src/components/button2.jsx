@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
 
-// const API_KEY = "awMXFC3RsKaQ3nNjELoXXh9XFJbZMnTSrSw7IVzdJj0";
+// const API_KEY = import.meta.env.VITE_UNSPLASH_API_KEY;
 
 function Button2(props) {
   // const img_det = useSelector((state) => state.img.ImgArray);

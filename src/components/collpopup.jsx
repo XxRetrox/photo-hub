@@ -16,6 +16,7 @@ import CollList from "./coll-list";
 import InputSearch from "./imput";
 import { setInputColText } from "../state/inputtextslice";
 import Notification from "./notification";
+import { useRef } from "react";
 
 function ColPopUp(params) {
   const dispatch = useDispatch();
@@ -24,6 +25,7 @@ function ColPopUp(params) {
   const photo = useSelector((state) => state.img.ColImgArr);
   const show = useSelector((state) => state.boolean.value3);
   const photoIndex = useSelector((state) => state.index.value);
+  const notificationTimer = useRef(null);
 
   function hide() {
     dispatch(setAddState(false));
@@ -33,6 +35,9 @@ function ColPopUp(params) {
 
   const addColl = async (id, col) => {
     console.log("clicked");
+    if (notificationTimer.current) {
+      clearTimeout(notificationTimer.current);
+    }
     if (id && col) {
       const collId = id;
       const collName = col;
@@ -43,14 +48,17 @@ function ColPopUp(params) {
       dispatch(setAction("added to"));
 
       try {
-        const response = await axios.post("http://localhost:5000/api/imgcoll", {
-          collId: collId,
-          collName: collName,
-          imgId: photo.id,
-          imgUrl: photo.urls.small,
-          imgH: photo.height,
-          imgW: photo.width,
-        });
+        const response = await axios.post(
+          `${import.meta.env.VITE_API_URL}/api/imgcoll`,
+          {
+            collId: collId,
+            collName: collName,
+            imgId: photo.id,
+            imgUrl: photo.urls.small,
+            imgH: photo.height,
+            imgW: photo.width,
+          }
+        );
 
         const arrColl = response.data.collArray;
         dispatch(setCollArray(arrColl));
@@ -59,6 +67,10 @@ function ColPopUp(params) {
         );
         dispatch(setSearchedColl(result));
         dispatch(setShowNotify(true));
+        notificationTimer.current = setTimeout(() => {
+          dispatch(setShowNotify(false));
+          notificationTimer.current = null;
+        }, 3000);
       } catch (error) {
         console.error("Error adding image to collection:", error);
       }

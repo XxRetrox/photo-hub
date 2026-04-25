@@ -7,9 +7,10 @@ import axios from "axios";
 import React, { useState, useEffect } from "react";
 
 const breakpointColumsObj = {
-  default: 5,
-  800: 3,
-  500: 2,
+  default: 4,
+  1100: 3,
+  700: 2,
+  500: 1,
 };
 
 function ColImgGrid(props) {
@@ -23,7 +24,7 @@ function ColImgGrid(props) {
       dispatch(isLoading(true));
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/collimages/${colId}`
+          `${import.meta.env.VITE_API_URL}/api/collimages/${colId}`
         );
         const array = response.data.collArray;
         setArrayOfColPhotos(array);

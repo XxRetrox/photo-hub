@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setImgArray } from "../../state/indimageslice";
+import { useEffect } from "react";
 import { isLoading } from "../../state/photosloadingsclice";
 import { setDL } from "../../state/photosloadingsclice";
 import axios from "axios";
@@ -17,12 +18,11 @@ import { isTrue1 } from "../../state/removebolslice";
 import { setDownloadCard, setAddState } from "../../state/booleanslice";
 import { setState } from "../../state/booleanslice";
 import { setCollArray, setRevCollArray } from "../../state/collslice";
+import ImageColl from "../image_colls";
 
-const API_KEY = "awMXFC3RsKaQ3nNjELoXXh9XFJbZMnTSrSw7IVzdJj0";
+const API_KEY = import.meta.env.VITE_UNSPLASH_API_KEY;
 
-async function onLoad() {
-  const dispatch = useDispatch();
-  const { query } = useParams();
+async function onLoad(dispatch, query) {
   if (query) {
     try {
       dispatch(clearPhotos());
@@ -30,7 +30,7 @@ async function onLoad() {
       // navigate(`/results/${searchValue}`);
 
       const response = await axios.get(
-        `http://localhost:5000/api/image/${query}`
+        `${import.meta.env.VITE_API_URL}/api/image/${query}`
       );
       const imgArray = response.data.imgArray;
       dispatch(setImgArray(imgArray));
@@ -40,13 +40,16 @@ async function onLoad() {
 
       const searchValue = imgArray.tags[0].title;
       console.log(searchValue, "image summary");
-      const response1 = await axios.get(`http://localhost:5000/api/photo`, {
-        params: {
-          searchValue: searchValue,
-          perPage: perPage,
-          Page: Page,
-        },
-      });
+      const response1 = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/photo`,
+        {
+          params: {
+            searchValue: searchValue,
+            perPage: perPage,
+            Page: Page,
+          },
+        }
+      );
       dispatch(isLoading(false));
       const array = response1.data.photosArray;
       dispatch(setImageArray(array));
@@ -57,14 +60,41 @@ async function onLoad() {
 }
 
 function ImgBody(params) {
+  const { query } = useParams();
   const loading = useSelector((state) => state.load.value);
   const image = useSelector((state) => state.img.ImgArray);
   const dispatch = useDispatch();
 
-  if (image === null && loading === true) {
-    console.log("First Load");
-    onLoad();
-  }
+  useEffect(() => {
+    if (image === null && loading === true) {
+      console.log("First Load Triggered");
+      onLoad(dispatch, query);
+    }
+  }, [image, loading, dispatch, query]);
+
+  useEffect(() => {
+    async function showImgColl() {
+      console.log(image);
+      if (image) {
+        const imgId = image.id;
+        try {
+          const response = await axios.get(
+            `${import.meta.env.VITE_API_URL}/api/revcoll/${imgId}`
+          );
+          const collArray = response.data.collArray;
+          // if (Array.isArray(collArray)) {
+          //   dispatch(setState(true));
+          // } else {
+          //   dispatch(setState(false));
+          // }
+          dispatch(setRevCollArray(collArray));
+        } catch (error) {
+          console.error("Error retrieving collections:", error);
+        }
+      }
+    }
+    showImgColl();
+  }, [image]);
 
   const handleDownload = async (photo) => {
     try {
@@ -110,7 +140,7 @@ function ImgBody(params) {
 
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/revcoll/${imgId}`
+        `${import.meta.env.VITE_API_URL}/api/revcoll/${imgId}`
       );
       const collArray = response.data.collArray;
       if (Array.isArray(collArray)) {
@@ -132,7 +162,7 @@ function ImgBody(params) {
 
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/coll/${imgId}`
+        `${import.meta.env.VITE_API_URL}/api/coll/${imgId}`
       );
       const collArray = response.data.collArray;
       dispatch(setCollArray(collArray));
@@ -164,7 +194,6 @@ function ImgBody(params) {
                 }}
               ></div>
             )}
-
             <div className={loading ? "none" : "img-contents"}>
               <div className="descr">
                 {loading ? (
@@ -181,7 +210,7 @@ function ImgBody(params) {
               </div>
               <div>
                 <Button2
-                  bName="Download"
+                  bName="Download Full Image"
                   fName={() => handleDownload(image)}
                 ></Button2>
               </div>
@@ -192,6 +221,7 @@ function ImgBody(params) {
                 ></Button2>
               </div>
             </div>
+            <ImageColl></ImageColl>
           </div>
         </div>
       )}

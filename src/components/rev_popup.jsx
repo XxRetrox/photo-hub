@@ -9,6 +9,7 @@ import { setShowNotify } from "../state/booleanslice";
 import { isTrue1 } from "../state/removebolslice";
 import axios from "axios";
 import Notification from "./notification";
+import { useRef } from "react";
 
 function RevPopUp() {
   const dispatch = useDispatch();
@@ -19,6 +20,7 @@ function RevPopUp() {
   const show = useSelector((state) => state.revboolean.value);
   const det = useSelector((state) => state.boolean.value2);
   const photoIndex = useSelector((state) => state.index.value);
+  const notificationTimer = useRef(null);
 
   function hide() {
     dispatch(isTrue1(false));
@@ -26,6 +28,9 @@ function RevPopUp() {
 
   const revColl = async (id, col) => {
     console.log("clicked");
+    if (notificationTimer.current) {
+      clearTimeout(notificationTimer.current);
+    }
     if (id && col) {
       const collId = id;
       const collName = col;
@@ -36,7 +41,7 @@ function RevPopUp() {
 
       try {
         const response = await axios.post(
-          "http://localhost:5000/api/revimgcoll",
+          `${import.meta.env.VITE_API_URL}/api/revimgcoll`,
           {
             collId: collId,
             collName: collName,
@@ -47,8 +52,12 @@ function RevPopUp() {
         const arrColl = response.data.collArray;
         dispatch(setRevCollArray(arrColl));
         dispatch(setShowNotify(true));
+        notificationTimer.current = setTimeout(() => {
+          dispatch(setShowNotify(false));
+          notificationTimer.current = null;
+        }, 3000);
       } catch (error) {
-        console.error("Error adding image to collection:", error);
+        console.error("Error removing image from collection:", error);
       }
     }
   };
@@ -57,7 +66,7 @@ function RevPopUp() {
     <div onClick={hide} className={show ? "overlay" : "hide"}>
       <div onClick={(e) => e.stopPropagation()} className="pop">
         <div className="list-coll">
-          {det ? (
+          {Array.isArray(coll2) ? (
             coll2.map((col, index) => {
               return (
                 <div

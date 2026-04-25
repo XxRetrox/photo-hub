@@ -29,7 +29,7 @@ function ColImgCard(props) {
           dispatch(isLoading(true));
           navigate(`/image/${imgID}`);
           const response = await axios.get(
-            `http://localhost:5000/api/image/${imgID}`
+            `${import.meta.env.VITE_API_URL}/api/image/${imgID}`
           );
 
           const imgArray = response.data.imgArray;
@@ -40,13 +40,16 @@ function ColImgCard(props) {
 
           const searchValue = imgArray.tags[0].title;
           console.log(searchValue);
-          const response1 = await axios.get(`http://localhost:5000/api/photo`, {
-            params: {
-              searchValue: searchValue,
-              perPage: perPage,
-              Page: Page,
-            },
-          });
+          const response1 = await axios.get(
+            `${import.meta.env.VITE_API_URL}/api/photo`,
+            {
+              params: {
+                searchValue: searchValue,
+                perPage: perPage,
+                Page: Page,
+              },
+            }
+          );
           dispatch(isLoading(false));
           const array = response1.data.photosArray;
           dispatch(setImageArray(array));
@@ -65,7 +68,7 @@ function ColImgCard(props) {
 
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/coll/${imgId}`
+        `${import.meta.env.VITE_API_URL}/api/coll/${imgId}`
       );
       const collArray = response.data.collArray;
       const imgArray = response.data.imgArray;

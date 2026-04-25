@@ -10,9 +10,10 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { setPageNum } from "../../state/booleanslice";
 
 const breakpointColumsObj = {
-  default: 5,
-  800: 3,
-  500: 2,
+  default: 4,
+  1100: 3,
+  700: 2,
+  500: 1,
 };
 
 function ResultBody() {
@@ -24,53 +25,65 @@ function ResultBody() {
   const loading = useSelector((state) => state.load.value);
   // const [page, setPage] = useState(1);
   const [loading1, setLoading] = useState(false);
+  const [itHasMore, setItHasMore] = useState(true);
   const observer = useRef();
   const dispatch = useDispatch();
 
   useEffect(() => {
     let isCancelled = false;
-    dispatch(clearPhotos());
-    async function onLoad() {
-      console.log("first load");
+    async function fetchPhotos() {
+      if (!query) return;
 
-      if (query) {
+      if (page === 1) {
+        console.log("first load");
+        dispatch(clearPhotos());
+        dispatch(isLoading(true));
+      } else {
+        console.log("loading more photos");
+        setLoading(true);
+      }
+
+      try {
         const searchValue = query;
-        const perPage = 5;
-        const Page = 1;
-        dispatch(setInpName(searchValue));
-        try {
-          // dispatch(clearPhotos());
-          dispatch(isLoading(true));
-          // navigate(`/results/${searchValue}`);
+        const perPage = 20;
+        const Page = page;
 
-          const response = await axios.get(`http://localhost:5000/api/photo`, {
+        dispatch(setInpName(searchValue));
+
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/photo`,
+          {
             params: {
               searchValue: searchValue,
               perPage: perPage,
               Page: Page,
             },
-          });
-          if (!isCancelled) {
-            const array = response.data.photosArray;
-            dispatch(setPhotoArray(array));
-            dispatch(isLoading(false));
           }
-        } catch (error) {
-          if (!isCancelled)
-            console.error("Unable to get backend message:", error);
+        );
+        if (!isCancelled) {
+          const array = response.data.photosArray;
+          const moreImages = response.data.itHasMore;
+          dispatch(setPhotoArray(array));
+          dispatch(isLoading(false));
+          setItHasMore(moreImages);
         }
+      } catch (error) {
+        if (!isCancelled)
+          console.error("Unable to get backend message:", error);
       }
+      setLoading(false);
     }
 
-    onLoad();
+    fetchPhotos();
 
     return () => {
       isCancelled = true;
     };
-  }, [query, dispatch]);
+  }, [query, page, dispatch]);
 
   const lastImageRef = useCallback(
     (node) => {
+      if (!itHasMore) return;
       if (loading1) return;
       if (observer.current) observer.current.disconnect();
 
@@ -85,33 +98,6 @@ function ResultBody() {
     },
     [loading1]
   );
-
-  useEffect(() => {
-    async function loadPhotos() {
-      if (searchInp) {
-        setLoading(true);
-        const searchValue = searchInp;
-        const perPage = 5;
-        const Page = page;
-        try {
-          const response = await axios.get(`http://localhost:5000/api/photo`, {
-            params: {
-              searchValue: searchValue,
-              perPage: perPage,
-              Page: Page,
-            },
-          });
-          const array = response.data.photosArray;
-          dispatch(setPhotoArray(array));
-        } catch (error) {
-          console.error("Error fetching images:", error);
-        }
-        setLoading(false);
-      }
-    }
-
-    loadPhotos();
-  }, [page]);
 
   return (
     <div className="body">
@@ -133,38 +119,43 @@ function ResultBody() {
         <div className={loading ? "w load" : "none"}></div>
         <div className={loading ? "w load" : "none"}></div>
         <div className={loading ? "h load" : "none"}></div>
-        {arrayOfPhotos.map((photo, index) => {
-          if (arrayOfPhotos.length === index + 1) {
-            return (
-              <ImgCard
-                key={photo.id}
-                ref={lastImageRef}
-                bgImg={photo.urls.small}
-                width={photo.width}
-                height={photo.height}
-                imgId={photo.id}
-                iIndex={index}
-              ></ImgCard>
-            );
-          }
-          return (
-            <ImgCard
-              key={photo.id}
-              bgImg={photo.urls.small}
-              width={photo.width}
-              height={photo.height}
-              imgId={photo.id}
-              iIndex={index}
-            ></ImgCard>
-          );
-        })}
+        {loading
+          ? null
+          : arrayOfPhotos.map((photo, index) => {
+              if (arrayOfPhotos.length === index + 1) {
+                return (
+                  <ImgCard
+                    key={photo.id}
+                    ref={lastImageRef}
+                    bgImg={photo.urls.small}
+                    width={photo.width}
+                    height={photo.height}
+                    imgId={photo.id}
+                    iIndex={index}
+                  ></ImgCard>
+                );
+              }
+              return (
+                <ImgCard
+                  key={photo.id}
+                  bgImg={photo.urls.small}
+                  width={photo.width}
+                  height={photo.height}
+                  imgId={photo.id}
+                  iIndex={index}
+                ></ImgCard>
+              );
+            })}
+        {}
       </Masonry>
-      <div className="loading-circle">
-        <div className="cir"></div>
-        <div className="cir"></div>
-        <div className="cir"></div>
-        <div className="cir"></div>
-      </div>
+      {itHasMore ? (
+        <div className="loading-circle">
+          <div className="cir"></div>
+          <div className="cir"></div>
+          <div className="cir"></div>
+          <div className="cir"></div>
+        </div>
+      ) : null}
     </div>
   );
 }

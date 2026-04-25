@@ -11,14 +11,17 @@ import CollList from "./coll-list";
 import InputSearch from "./imput";
 import { setInputColText } from "../state/inputtextslice";
 import Notification from "./notification";
+import { useRef } from "react";
 
 function PopUp() {
   const dispatch = useDispatch();
   const inpText = useSelector((state) => state.text.value);
   const coll = useSelector((state) => state.collection.collArray);
+  const inp = useSelector((state) => state.text.inputcol);
   const photo = useSelector((state) => state.photos.photoArray);
   const show = useSelector((state) => state.boolean.value);
   const photoIndex = useSelector((state) => state.index.value);
+  const notificationTimer = useRef(null);
 
   function hide() {
     dispatch(isTrue(false));
@@ -28,6 +31,9 @@ function PopUp() {
 
   const addColl = async (id, col) => {
     console.log("clicked");
+    if (notificationTimer.current) {
+      clearTimeout(notificationTimer.current);
+    }
     if (id && col) {
       const collId = id;
       const collName = col;
@@ -37,14 +43,17 @@ function PopUp() {
       dispatch(setAction("added to"));
 
       try {
-        const response = await axios.post("http://localhost:5000/api/imgcoll", {
-          collId: collId,
-          collName: collName,
-          imgId: photo[photoIndex].id,
-          imgUrl: photo[photoIndex].urls.small,
-          imgH: photo[photoIndex].height,
-          imgW: photo[photoIndex].width,
-        });
+        const response = await axios.post(
+          `${import.meta.env.VITE_API_URL}/api/imgcoll`,
+          {
+            collId: collId,
+            collName: collName,
+            imgId: photo[photoIndex].id,
+            imgUrl: photo[photoIndex].urls.small,
+            imgH: photo[photoIndex].height,
+            imgW: photo[photoIndex].width,
+          }
+        );
 
         const arrColl = response.data.collArray;
         dispatch(setCollArray(arrColl));
@@ -53,6 +62,10 @@ function PopUp() {
         );
         dispatch(setSearchedColl(result));
         dispatch(setShowNotify(true));
+        notificationTimer.current = setTimeout(() => {
+          dispatch(setShowNotify(false));
+          notificationTimer.current = null;
+        }, 3000);
       } catch (error) {
         console.error("Error adding image to collection:", error);
       }

@@ -5,8 +5,12 @@ import { setRandom } from "../../state/searchnamesclice";
 import { useDispatch, useSelector } from "react-redux";
 import { isLoading } from "../../state/photosloadingsclice";
 import { clearPhotos } from "../../state/photoslice";
+import { setPhotoArray } from "../../state/photoslice";
 import { useNavigate } from "react-router-dom";
-import logo from "../../assets/logo.svg";
+import logo from "../../assets/Rx_logo.png";
+import { Link } from "react-router-dom";
+import { setInpName } from "../../state/searchnamesclice";
+import { resetPageNum } from "../../state/booleanslice";
 
 function HomeHeader() {
   const ranWords = useSelector((state) => state.searchtext.random);
@@ -16,11 +20,13 @@ function HomeHeader() {
   useEffect(() => {
     async function onLoad() {
       try {
-        const response = await axios.get("http://localhost:5000/api/random");
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/random`
+        );
         const array = response.data.ranArray;
         dispatch(setRandom(array));
       } catch (error) {
-        console.error("Error get random nouns:", error);
+        console.error("Error getting random nouns:", error);
       }
     }
 
@@ -31,35 +37,24 @@ function HomeHeader() {
     const searchValue = word;
 
     if (searchValue) {
-      const perPage = 5;
-
       console.log(searchValue);
-      try {
-        dispatch(clearPhotos());
-        dispatch(isLoading(true));
-        navigate(`/results/${searchValue}`);
+      dispatch(setInpName(searchValue));
 
-        const response = await axios.get(`http://localhost:5000/api/photo`, {
-          params: {
-            searchValue: searchValue,
-            perPage: perPage,
-          },
-        });
-        const array = response.data.photosArray;
-        dispatch(setPhotoArray(array));
-        dispatch(isLoading(false));
-      } catch (error) {
-        console.error("Unable to get backend message:", error);
-      }
+      dispatch(clearPhotos());
+      dispatch(isLoading(true));
+      dispatch(resetPageNum());
+      navigate(`/results/${searchValue}`);
     }
   };
 
   return (
     <div className="navbar">
-      <div className="logo-container">
-        <img src={logo} alt="Company Logo" className="logo-img" />
-      </div>
-      {ranWords.map((ran, index) => {
+      <Link className="logo-link" to="/">
+        <div className="logo-container">
+          <img src={logo} alt="Company Logo" className="logo-img" />
+        </div>
+      </Link>
+      {ranWords.slice(0, 3).map((ran, index) => {
         return (
           <div
             key={index}
@@ -71,11 +66,8 @@ function HomeHeader() {
           </div>
         );
       })}
-      {/* <div className="bar">#List Collection</div>
-      <div className="bar">#List Collection</div>
-      <div className="bar">#List Collection</div> */}
       <div className="bar">
-        <Button bName="Collections" rout="/collections"></Button>
+        <Button bName="Collection" rout="/collections"></Button>
       </div>
     </div>
   );

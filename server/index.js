@@ -3,6 +3,7 @@ dns.setDefaultResultOrder("ipv4first");
 import http from "http";
 import https from "https";
 import express from "express";
+import "dotenv/config";
 import cors from "cors";
 import axios from "axios";
 import pg from "pg";
@@ -13,16 +14,16 @@ const corsOptions = {
   origin: ["http://localhost:5173"],
   credentials: true,
 };
-const API_KEY = "awMXFC3RsKaQ3nNjELoXXh9XFJbZMnTSrSw7IVzdJj0";
+const API_KEY = process.env.UNSPLASH_API_KEY;
 
 app.use(cors(corsOptions));
 
 const db = new pg.Pool({
-  user: "postgres",
-  host: "localhost",
-  database: "Collections",
-  password: "453963",
-  port: 5432,
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_DATABASE,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
 });
 
 async function testDbConnection() {
@@ -52,8 +53,9 @@ app.get("/api/photo", async (req, res) => {
   const query = req.query.searchValue;
   const perPage = req.query.perPage;
   const Page = req.query.Page;
-  console.log(Page);
-  console.log(perPage);
+  // console.log(Page);
+  // console.log(perPage);
+  console.log(query);
 
   if (query) {
     try {
@@ -69,9 +71,20 @@ app.get("/api/photo", async (req, res) => {
         }
       );
       const array = response.data.results;
-      return res.status(200).json({
-        photosArray: array,
-      });
+      const pagesAvaliable = response.data.total_pages;
+      console.log(array[0].slug);
+      console.log(pagesAvaliable);
+      if (Page >= pagesAvaliable) {
+        return res.status(200).json({
+          photosArray: array,
+          itHasMore: false,
+        });
+      } else {
+        return res.status(200).json({
+          photosArray: array,
+          itHasMore: true,
+        });
+      }
     } catch (error) {
       console.log("Error occurred while fetching photos:", error);
     }
@@ -201,10 +214,10 @@ app.get("/api/revcoll/:imgId", async (req, res) => {
       "SELECT coll_id, coll_name FROM photo_coll WHERE img_id = $1",
       [imgId]
     );
-    console.log(response2.rows);
+    // console.log(response2.rows);
     var array;
 
-    if (response2.rows.length < 1) {
+    if (response2.rows.length === 0) {
       array = "This image is not in any collection";
     } else {
       array = response2.rows;
@@ -236,9 +249,11 @@ app.post("/api/imgcoll", async (req, res) => {
     const array = array1.filter(
       (arr1item) => !array2.some((arr2item) => arr2item.coll_id === arr1item.id)
     );
-    return res
-      .status(200)
-      .json({ collArray: array, message: "Succesfully added to collection" });
+    return res.status(200).json({
+      collArray: array,
+      message: "Succesfully added to collection",
+      imgColArray: array2,
+    });
   } catch (error) {
     console.log("Error fetching collections:", error);
   }
@@ -276,7 +291,8 @@ app.get("/api/collname", async (req, res) => {
     const response = await db.query(
       "SELECT DISTINCT coll_id, coll_name FROM photo_coll"
     );
-    console.log(response.rows);
+    // console.log(response.rows);
+    console.log("fetch col names and ids");
     var array;
 
     if (response.rows.length < 0) {
@@ -305,7 +321,7 @@ app.get("/api/collimages/:colId", async (req, res) => {
         "SELECT * FROM photo_coll WHERE coll_id = $1 ORDER BY photocoll_id DESC",
         [colId]
       );
-      console.log(response.rows);
+      // console.log(response.rows);
 
       const array = response.rows;
 
@@ -320,7 +336,7 @@ app.get("/api/collimages/:colId", async (req, res) => {
         "SELECT * FROM photo_coll WHERE coll_id = $1 ORDER BY photocoll_id DESC LIMIT 5",
         [colId]
       );
-      console.log(response.rows);
+      // console.log(response.rows);
 
       const array = response.rows;
 
@@ -333,27 +349,18 @@ app.get("/api/collimages/:colId", async (req, res) => {
 });
 
 app.get("/api/random", async (req, res) => {
-  const count = 3;
-  const topics = [
-    "nature",
-    "city",
-    "objects",
-    "abstract",
-    "technology",
-    "sport",
-    "scene",
-  ];
-  const randomTopic = topics[Math.floor(Math.random() * topics.length)];
-
   try {
-    const response = await axios.get(
-      `https://api.datamuse.com/words?ml=${randomTopic}&max=${count}`
+    const response = await db.query(
+      "SELECT * FROM words ORDER BY RANDOM() LIMIT 8"
     );
-    const array = response.data;
-    console.log(array);
+    // console.log(response.rows);
+
+    const array = response.rows;
+
+    // console.log(array);
     return res.status(200).json({ ranArray: array });
   } catch (error) {
-    console.log("Error fetching random words:", error);
+    console.log("Error fetching images tags:", error);
   }
 });
 
