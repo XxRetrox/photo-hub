@@ -14,19 +14,13 @@ function DownloadPopup(params) {
     const social = e.currentTarget.id;
 
     if (social === "insta") {
-      console.log("loading insta");
       const url = `https://www.instagram.com/${socials.instagram_username}`;
-      console.log(url);
       window.open(url, "_blank", "noopener noreferrer");
     } else if (social === "portfolio") {
-      console.log("loading portfolio");
       const url = socials.portfolio_url;
-      console.log(url);
       window.open(url, "_blank", "noopener noreferrer");
     } else {
-      console.log("loading x");
       const url = `https://x.com/${socials.twitter_username}`;
-      console.log(url);
       window.open(url, "_blank", "noopener noreferrer");
     }
   }

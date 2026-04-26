@@ -37,7 +37,6 @@ function HomeHeader() {
     const searchValue = word;
 
     if (searchValue) {
-      console.log(searchValue);
       dispatch(setInpName(searchValue));
 
       dispatch(clearPhotos());

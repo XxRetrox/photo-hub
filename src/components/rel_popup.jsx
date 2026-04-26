@@ -29,7 +29,6 @@ function RelPopUp(params) {
   }
 
   const addColl = async (id, col) => {
-    console.log("clicked");
     if (notificationTimer.current) {
       clearTimeout(notificationTimer.current);
     }
@@ -37,7 +36,6 @@ function RelPopUp(params) {
       const collId = id;
       const collName = col;
 
-      console.log(collId, collName);
       dispatch(setImageColl(collName));
       dispatch(setAction("added to"));
 

@@ -37,7 +37,6 @@ function InputSearch() {
     if (value === "") {
       dispatch(setEmptyState(true));
     } else {
-      console.log(value);
       debouncedSearch(value);
       dispatch(setEmptyState(false));
     }

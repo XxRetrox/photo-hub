@@ -35,11 +35,11 @@ function ResultBody() {
       if (!query) return;
 
       if (page === 1) {
-        console.log("first load");
+        // console.log("first load");
         dispatch(clearPhotos());
         dispatch(isLoading(true));
       } else {
-        console.log("loading more photos");
+        // console.log("loading more photos");
         setLoading(true);
       }
 
@@ -89,7 +89,7 @@ function ResultBody() {
 
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting) {
-          console.log("setting page:", page);
+          // console.log("setting page:", page);
           dispatch(setPageNum());
         }
       });

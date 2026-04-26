@@ -38,7 +38,6 @@ const ImgCard = forwardRef((props, forwardedRef) => {
   async function showImg() {
     if (divRef.current) {
       const imgID = divRef.current.id;
-      console.log(imgID);
 
       try {
         if (imgID) {
@@ -58,7 +57,7 @@ const ImgCard = forwardRef((props, forwardedRef) => {
           const Page = 1;
 
           const searchValue = imgArray.tags[0].title;
-          console.log(searchValue, "image summary");
+
           const response1 = await axios.get(
             `${import.meta.env.VITE_API_URL}/api/photo`,
             {
@@ -74,7 +73,7 @@ const ImgCard = forwardRef((props, forwardedRef) => {
           dispatch(setImageArray(array));
         }
       } catch (error) {
-        console.log("No image id found for this image:", error);
+        console.error("No image id found for this image:", error);
       }
     }
   }
@@ -116,7 +115,6 @@ const ImgCard = forwardRef((props, forwardedRef) => {
   };
 
   const showColl = async (imageId) => {
-    console.log(imageId);
     dispatch(isTrue(true));
 
     dispatch(setIndex(imageId));

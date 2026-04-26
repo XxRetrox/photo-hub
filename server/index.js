@@ -54,8 +54,7 @@ app.get("/api/photo", async (req, res) => {
   const perPage = req.query.perPage;
   const Page = req.query.Page;
   // console.log(Page);
-  // console.log(perPage);
-  console.log(query);
+  // console.log(query);
 
   if (query) {
     try {
@@ -72,8 +71,7 @@ app.get("/api/photo", async (req, res) => {
       );
       const array = response.data.results;
       const pagesAvaliable = response.data.total_pages;
-      console.log(array[0].slug);
-      console.log(pagesAvaliable);
+      // console.log(pagesAvaliable);
       if (Page >= pagesAvaliable) {
         return res.status(200).json({
           photosArray: array,
@@ -86,7 +84,7 @@ app.get("/api/photo", async (req, res) => {
         });
       }
     } catch (error) {
-      console.log("Error occurred while fetching photos:", error);
+      console.error("Error occurred while fetching photos:", error);
     }
   } else {
     console.log("No query received");
@@ -122,7 +120,7 @@ app.get("/api/sugg/:query", async (req, res) => {
         suggArray: arrayOfSugg,
       });
     } catch (error) {
-      console.log("Error occurred while fetching suggestions:", error);
+      console.error("Error occurred while fetching suggestions:", error);
     }
   } else {
     console.log("No query received");
@@ -131,7 +129,6 @@ app.get("/api/sugg/:query", async (req, res) => {
 
 app.get("/api/image/:query", async (req, res) => {
   const { query } = req.params;
-  console.log(query);
 
   if (query) {
     try {
@@ -149,7 +146,7 @@ app.get("/api/image/:query", async (req, res) => {
         imgArray: array,
       });
     } catch (error) {
-      console.log("Error fetching image details:", error);
+      console.error("Error fetching image details:", error);
     }
   } else {
     console.log("No query received for specific image");
@@ -163,7 +160,6 @@ app.get("/api/coll/:imgId", async (req, res) => {
 
   if (imgId.endsWith(diff)) {
     imgId = imgId.slice(0, -5);
-    console.log(imgId);
 
     try {
       const response = await axios.get(
@@ -183,27 +179,24 @@ app.get("/api/coll/:imgId", async (req, res) => {
 
   try {
     const response = await db.query("SELECT * FROM coll");
-    // console.log(response.rows);
     const array1 = response.rows;
 
     const response2 = await db.query(
       "SELECT coll_id, coll_name FROM photo_coll WHERE img_id = $1",
       [imgId]
     );
-    // console.log(response.rows);
     const array2 = response2.rows;
 
     const array = array1.filter(
       (arr1item) => !array2.some((arr2item) => arr2item.coll_id === arr1item.id)
     );
-    // console.log(array);
     if (imgArr === "") {
       return res.status(200).json({ collArray: array });
     } else {
       return res.status(200).json({ collArray: array, imgArray: imgArr });
     }
   } catch (error) {
-    console.log("Error fetching collections:", error);
+    console.error("Error fetching collections:", error);
   }
 });
 
@@ -214,7 +207,6 @@ app.get("/api/revcoll/:imgId", async (req, res) => {
       "SELECT coll_id, coll_name FROM photo_coll WHERE img_id = $1",
       [imgId]
     );
-    // console.log(response2.rows);
     var array;
 
     if (response2.rows.length === 0) {
@@ -222,10 +214,9 @@ app.get("/api/revcoll/:imgId", async (req, res) => {
     } else {
       array = response2.rows;
     }
-    // console.log(array);
     return res.status(200).json({ collArray: array });
   } catch (error) {
-    console.log("Error fetching collections:", error);
+    console.error("Error fetching collections:", error);
   }
 });
 
@@ -243,7 +234,6 @@ app.post("/api/imgcoll", async (req, res) => {
       "SELECT coll_id, coll_name FROM photo_coll WHERE img_id = $1",
       [imgId]
     );
-    // console.log(response.rows);
     const array2 = response2.rows;
 
     const array = array1.filter(
@@ -255,7 +245,7 @@ app.post("/api/imgcoll", async (req, res) => {
       imgColArray: array2,
     });
   } catch (error) {
-    console.log("Error fetching collections:", error);
+    console.error("Error fetching collections:", error);
   }
 });
 
@@ -270,7 +260,6 @@ app.post("/api/revimgcoll", async (req, res) => {
       "SELECT coll_id, coll_name FROM photo_coll WHERE img_id = $1",
       [imgId]
     );
-    // console.log(response.rows);
     var array;
 
     if (response2.rows.length < 0) {
@@ -282,7 +271,7 @@ app.post("/api/revimgcoll", async (req, res) => {
       .status(200)
       .json({ collArray: array, message: "Succesfully added to collection" });
   } catch (error) {
-    console.log("Error fetching collections:", error);
+    console.error("Error fetching collections:", error);
   }
 });
 
@@ -291,8 +280,7 @@ app.get("/api/collname", async (req, res) => {
     const response = await db.query(
       "SELECT DISTINCT coll_id, coll_name FROM photo_coll"
     );
-    // console.log(response.rows);
-    console.log("fetch col names and ids");
+    // console.log("fetch col names and ids");
     var array;
 
     if (response.rows.length < 0) {
@@ -300,10 +288,9 @@ app.get("/api/collname", async (req, res) => {
     } else {
       array = response.rows;
     }
-    // console.log(array);
     return res.status(200).json({ collArray: array });
   } catch (error) {
-    console.log("Error fetching collection names and ids:", error);
+    console.error("Error fetching collection names and ids:", error);
   }
 });
 
@@ -321,11 +308,9 @@ app.get("/api/collimages/:colId", async (req, res) => {
         "SELECT * FROM photo_coll WHERE coll_id = $1 ORDER BY photocoll_id DESC",
         [colId]
       );
-      // console.log(response.rows);
 
       const array = response.rows;
 
-      // console.log(array);
       return res.status(200).json({ collArray: array });
     } catch (error) {
       console.error("Error getting collection images:", error);
@@ -336,14 +321,12 @@ app.get("/api/collimages/:colId", async (req, res) => {
         "SELECT * FROM photo_coll WHERE coll_id = $1 ORDER BY photocoll_id DESC LIMIT 5",
         [colId]
       );
-      // console.log(response.rows);
 
       const array = response.rows;
 
-      // console.log(array);
       return res.status(200).json({ collArray: array });
     } catch (error) {
-      console.log("Error fetching collection images:", error);
+      console.error("Error fetching collection images:", error);
     }
   }
 });
@@ -353,14 +336,12 @@ app.get("/api/random", async (req, res) => {
     const response = await db.query(
       "SELECT * FROM words ORDER BY RANDOM() LIMIT 8"
     );
-    // console.log(response.rows);
 
     const array = response.rows;
 
-    // console.log(array);
     return res.status(200).json({ ranArray: array });
   } catch (error) {
-    console.log("Error fetching images tags:", error);
+    console.error("Error fetching images tags:", error);
   }
 });
 

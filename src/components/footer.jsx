@@ -42,7 +42,6 @@ function Footer(params) {
       dispatch(clearPhotos());
       dispatch(isLoading(true));
       navigate(`/results/${searchValue}`);
-      console.log(searchValue);
     }
   };
 
@@ -69,7 +68,7 @@ function Footer(params) {
         </video>
       </div>
       <div className="footer-copy">
-        <p>Copyright &copy {year}</p>
+        <p>&copy; {year} xRx. All rights reserved.</p>
       </div>
     </div>
   );

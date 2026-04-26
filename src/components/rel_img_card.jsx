@@ -21,7 +21,6 @@ function RelImgCard(props) {
   async function showImg() {
     if (divRef.current) {
       const imgID = divRef.current.id;
-      console.log(imgID);
 
       try {
         if (imgID) {
@@ -39,7 +38,7 @@ function RelImgCard(props) {
           const Page = 1;
 
           const searchValue = imgArray.tags[0].title;
-          console.log(searchValue);
+
           const response1 = await axios.get(
             `${import.meta.env.VITE_API_URL}/api/photo`,
             {
@@ -55,13 +54,12 @@ function RelImgCard(props) {
           dispatch(setImageArray(array));
         }
       } catch (error) {
-        console.log("No image id found for this image:", error);
+        console.error("No image id found for this image:", error);
       }
     }
   }
 
   const showColl = async (imageId) => {
-    console.log(imageId);
     dispatch(isTrue(true));
 
     dispatch(setIndex(imageId));

@@ -30,7 +30,6 @@ function PopUp() {
   }
 
   const addColl = async (id, col) => {
-    console.log("clicked");
     if (notificationTimer.current) {
       clearTimeout(notificationTimer.current);
     }
@@ -38,7 +37,6 @@ function PopUp() {
       const collId = id;
       const collName = col;
 
-      console.log(collId, collName);
       dispatch(setImageColl(collName));
       dispatch(setAction("added to"));
 

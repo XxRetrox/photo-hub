@@ -11,8 +11,6 @@ function CollectionBody() {
   const coll = useSelector((state) => state.colName.colsort);
 
   function viewCollection(e) {
-    console.log(e.target.innerText);
-    console.log(e.currentTarget.id);
     dispatch(setColName(e.target.innerText));
     dispatch(setColId(e.currentTarget.id));
     navigate(`/indcoll/${e.currentTarget.id}/${e.target.innerText}`);

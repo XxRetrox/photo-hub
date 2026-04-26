@@ -29,7 +29,6 @@ const store = configureStore({
     index: ImgIndexStateReducer,
     revboolean: RevBooleanStateReducer,
   },
-  devTools: true,
 });
 
 export default store;

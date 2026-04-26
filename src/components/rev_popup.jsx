@@ -27,7 +27,6 @@ function RevPopUp() {
   }
 
   const revColl = async (id, col) => {
-    console.log("clicked");
     if (notificationTimer.current) {
       clearTimeout(notificationTimer.current);
     }
@@ -35,7 +34,6 @@ function RevPopUp() {
       const collId = id;
       const collName = col;
 
-      console.log(collId, collName);
       dispatch(setImageColl(collName));
       dispatch(setAction("removed from"));
 

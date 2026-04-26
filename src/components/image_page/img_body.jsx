@@ -27,7 +27,6 @@ async function onLoad(dispatch, query) {
     try {
       dispatch(clearPhotos());
       dispatch(isLoading(true));
-      // navigate(`/results/${searchValue}`);
 
       const response = await axios.get(
         `${import.meta.env.VITE_API_URL}/api/image/${query}`
@@ -39,7 +38,7 @@ async function onLoad(dispatch, query) {
       const Page = 1;
 
       const searchValue = imgArray.tags[0].title;
-      console.log(searchValue, "image summary");
+
       const response1 = await axios.get(
         `${import.meta.env.VITE_API_URL}/api/photo`,
         {
@@ -67,14 +66,13 @@ function ImgBody(params) {
 
   useEffect(() => {
     if (image === null && loading === true) {
-      console.log("First Load Triggered");
+      // console.log("First Load Triggered");
       onLoad(dispatch, query);
     }
   }, [image, loading, dispatch, query]);
 
   useEffect(() => {
     async function showImgColl() {
-      console.log(image);
       if (image) {
         const imgId = image.id;
         try {
@@ -82,11 +80,7 @@ function ImgBody(params) {
             `${import.meta.env.VITE_API_URL}/api/revcoll/${imgId}`
           );
           const collArray = response.data.collArray;
-          // if (Array.isArray(collArray)) {
-          //   dispatch(setState(true));
-          // } else {
-          //   dispatch(setState(false));
-          // }
+
           dispatch(setRevCollArray(collArray));
         } catch (error) {
           console.error("Error retrieving collections:", error);
@@ -133,7 +127,6 @@ function ImgBody(params) {
   };
 
   const revColl = async (image) => {
-    console.log(image.id);
     dispatch(isTrue1(true));
 
     const imgId = image.id;
@@ -155,7 +148,6 @@ function ImgBody(params) {
   };
 
   const addColl = async (image) => {
-    console.log(image.id);
     dispatch(setAddState(true));
 
     const imgId = image.id;

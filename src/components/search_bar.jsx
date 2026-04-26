@@ -61,8 +61,6 @@ function SearchBar() {
         dispatch(clearPhotos());
         dispatch(isLoading(true));
         navigate(`/results/${searchValue}`);
-
-        console.log(searchValue);
       } else {
         dispatch(isEmpty(true));
         setTimeout(() => {
@@ -76,7 +74,6 @@ function SearchBar() {
     const { type, value } = e.target;
     dispatch(setText(value));
     if (type === "text" && value.length > 2) {
-      console.log(value);
       debouncedLog(value);
     } else {
       dispatch(clearSugg());
@@ -94,8 +91,6 @@ function SearchBar() {
       dispatch(clearPhotos());
       dispatch(isLoading(true));
       navigate(`/results/${searchValue}`);
-
-      console.log(searchValue);
     }
   }
 

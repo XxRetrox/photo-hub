@@ -15,8 +15,6 @@ function ImageColl() {
     navigate(`/indcoll/${colId}/${colName}`);
   }
 
-  console.log(imageColl);
-
   return (
     <div>
       {Array.isArray(imageColl) && imageColl.length !== 0 ? (
