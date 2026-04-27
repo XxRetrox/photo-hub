@@ -11,7 +11,7 @@ import pg from "pg";
 const app = express();
 app.use(express.json());
 const corsOptions = {
-  origin: ["http://localhost:5173"],
+  origin: ["http://localhost:5173", `${process.env.FRONTEND_URL}`],
   credentials: true,
 };
 const API_KEY = process.env.UNSPLASH_API_KEY;
