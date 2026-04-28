@@ -10,6 +10,11 @@ import { isTrue } from "../state/booleanslice";
 import { setIndex } from "../state/imgindexslice";
 import { setCollArray } from "../state/collslice";
 import { setImageArray } from "../state/relatedimageslice";
+import {
+  setApiErrorMsg,
+  setResetTime,
+  setIsApiLimited,
+} from "../state/booleanslice";
 
 function IndColImgCard(props) {
   const loading = useSelector((state) => state.load.value);
@@ -55,6 +60,12 @@ function IndColImgCard(props) {
           dispatch(setImageArray(array));
         }
       } catch (error) {
+        if (error.response.status === 429) {
+          const { message, resetTime, apiReached } = error.response.data;
+          dispatch(setApiErrorMsg(message));
+          dispatch(setIsApiLimited(apiReached));
+          dispatch(setResetTime(resetTime));
+        }
         console.error("No image id found for this image:", error);
       }
     }

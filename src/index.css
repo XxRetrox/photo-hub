@@ -861,6 +861,36 @@ strong {
   }
 }
 
+/* Alert Page */
+.alert-body {
+  width: 100%;
+  height: 100dvh;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: black;
+}
+
+.alert-contents {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 90%;
+}
+
+.alert-message,
+.alert-time {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.alert-message p {
+  font-size: 2.5rem;
+  text-align: center;
+}
+
 /* Extras */
 .logo-container {
   display: flex;
@@ -977,5 +1007,11 @@ strong {
   }
   .notify-con p {
     font-size: 0.85rem;
+  }
+  .alert-message p {
+    font-size: 2.2rem;
+  }
+  .alert-time p {
+    text-align: center;
   }
 }

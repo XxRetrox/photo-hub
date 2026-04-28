@@ -73,8 +73,9 @@ app.get("/api/photo", async (req, res) => {
         }
       );
       const array = response.data.results;
-      const pagesAvaliable = response.data.total_pages;
+      const pagesAvaliable = 4;
       // console.log(pagesAvaliable);
+
       if (Page >= pagesAvaliable) {
         return res.status(200).json({
           photosArray: array,
@@ -87,6 +88,21 @@ app.get("/api/photo", async (req, res) => {
         });
       }
     } catch (error) {
+      if (error.response && error.response.status === 403) {
+        const remaining = error.response.headers["x-ratelimit-remaining"];
+
+        if (remaining === "0") {
+          const now = new Date();
+          const minutesLeft = 61 - now.getMinutes();
+          const secondsLeft = minutesLeft * 60 - now.getSeconds();
+          return res.status(429).json({
+            message:
+              "Sorry! we've hit our photo limit API request for the hour. Try again shortly!",
+            resetTime: secondsLeft,
+            apiReached: true,
+          });
+        }
+      }
       console.error("Error occurred while fetching photos:", error);
     }
   } else {
@@ -145,10 +161,26 @@ app.get("/api/image/:query", async (req, res) => {
       );
 
       const array = response.data;
+
       return res.status(200).json({
         imgArray: array,
       });
     } catch (error) {
+      if (error.response && error.response.status === 403) {
+        const remaining = error.response.headers["x-ratelimit-remaining"];
+
+        if (remaining === "0") {
+          const now = new Date();
+          const minutesLeft = 61 - now.getMinutes();
+          const secondsLeft = minutesLeft * 60 - now.getSeconds();
+          return res.status(429).json({
+            message:
+              "Sorry! we've hit our photo limit API request for the hour. Try again shortly!",
+            resetTime: secondsLeft,
+            apiReached: true,
+          });
+        }
+      }
       console.error("Error fetching image details:", error);
     }
   } else {
@@ -176,6 +208,21 @@ app.get("/api/coll/:imgId", async (req, res) => {
 
       imgArr = response.data;
     } catch (error) {
+      if (error.response && error.response.status === 403) {
+        const remaining = error.response.headers["x-ratelimit-remaining"];
+
+        if (remaining === "0") {
+          const now = new Date();
+          const minutesLeft = 61 - now.getMinutes();
+          const secondsLeft = minutesLeft * 60 - now.getSeconds();
+          return res.status(429).json({
+            message:
+              "Sorry! we've hit our photo limit API request for the hour. Try again shortly!",
+            resetTime: secondsLeft,
+            apiReached: true,
+          });
+        }
+      }
       console.error("Error getting image details:", error);
     }
   }

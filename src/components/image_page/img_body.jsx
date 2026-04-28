@@ -19,6 +19,11 @@ import { setDownloadCard, setAddState } from "../../state/booleanslice";
 import { setState } from "../../state/booleanslice";
 import { setCollArray, setRevCollArray } from "../../state/collslice";
 import ImageColl from "../image_colls";
+import {
+  setApiErrorMsg,
+  setResetTime,
+  setIsApiLimited,
+} from "../../state/booleanslice";
 
 const API_KEY = import.meta.env.VITE_UNSPLASH_API_KEY;
 
@@ -53,6 +58,12 @@ async function onLoad(dispatch, query) {
       const array = response1.data.photosArray;
       dispatch(setImageArray(array));
     } catch (error) {
+      if (error.response.status === 429) {
+        const { message, resetTime, apiReached } = error.response.data;
+        dispatch(setApiErrorMsg(message));
+        dispatch(setIsApiLimited(apiReached));
+        dispatch(setResetTime(resetTime));
+      }
       console.error("Unable to get backend message:", error);
     }
   }
@@ -122,6 +133,18 @@ function ImgBody(params) {
       document.body.removeChild(link);
       window.URL.revokeObjectURL(blobUrl);
     } catch (error) {
+      if (error.response && error.response.status === 403) {
+        const remaining = error.response.headers["x-ratelimit-remaining"];
+
+        if (remaining === 0) {
+          return res.status(429).json({
+            message:
+              "Sorry! we've hit our photo limit API request for the hour. Try again shortly!",
+            resetTime: 600,
+            apiReached: true,
+          });
+        }
+      }
       console.error("Error downloading the image:", error);
     }
   };

@@ -10,6 +10,11 @@ import { isTrue, setDownloadCard, resetPageNum } from "../state/booleanslice";
 import { setIndex } from "../state/imgindexslice";
 import { setCollArray } from "../state/collslice";
 import { clearImages, setImageArray } from "../state/relatedimageslice";
+import {
+  setApiErrorMsg,
+  setResetTime,
+  setIsApiLimited,
+} from "../state/booleanslice";
 
 const API_KEY = import.meta.env.VITE_UNSPLASH_API_KEY;
 
@@ -73,6 +78,12 @@ const ImgCard = forwardRef((props, forwardedRef) => {
           dispatch(setImageArray(array));
         }
       } catch (error) {
+        if (error.response.status === 429) {
+          const { message, resetTime, apiReached } = error.response.data;
+          dispatch(setApiErrorMsg(message));
+          dispatch(setIsApiLimited(apiReached));
+          dispatch(setResetTime(resetTime));
+        }
         console.error("No image id found for this image:", error);
       }
     }
@@ -110,6 +121,18 @@ const ImgCard = forwardRef((props, forwardedRef) => {
 
       dispatch(setDownloadCard(true));
     } catch (error) {
+      if (error.response && error.response.status === 403) {
+        const remaining = error.response.headers["x-ratelimit-remaining"];
+
+        if (remaining === 0) {
+          return res.status(429).json({
+            message:
+              "Sorry! we've hit our photo limit API request for the hour. Try again shortly!",
+            resetTime: 600,
+            apiReached: true,
+          });
+        }
+      }
       console.error("Error downloading the image:", error);
     }
   };

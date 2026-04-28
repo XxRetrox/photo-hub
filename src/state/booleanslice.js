@@ -10,6 +10,9 @@ const BooleanState = createSlice({
     downloaded: false,
     showNotify: false,
     pageNum: 1,
+    isApiLimited: false,
+    apiErrorMsg: "",
+    resetTime: 0,
   },
   reducers: {
     isTrue: (state, action) => {
@@ -36,6 +39,15 @@ const BooleanState = createSlice({
     resetPageNum: (state, action) => {
       state.pageNum = 1;
     },
+    setIsApiLimited: (state, action) => {
+      state.isApiLimited = action.payload;
+    },
+    setApiErrorMsg: (state, action) => {
+      state.apiErrorMsg = action.payload;
+    },
+    setResetTime: (state, action) => {
+      state.resetTime = action.payload;
+    },
   },
 });
 
@@ -48,5 +60,8 @@ export const {
   setShowNotify,
   setPageNum,
   resetPageNum,
+  setApiErrorMsg,
+  setIsApiLimited,
+  setResetTime,
 } = BooleanState.actions;
 export default BooleanState.reducer;

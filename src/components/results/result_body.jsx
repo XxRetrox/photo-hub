@@ -7,7 +7,12 @@ import { setInpName } from "../../state/searchnamesclice";
 import { isLoading } from "../../state/photosloadingsclice";
 import { setPhotoArray, clearPhotos } from "../../state/photoslice";
 import { useState, useEffect, useRef, useCallback } from "react";
-import { setPageNum } from "../../state/booleanslice";
+import {
+  setPageNum,
+  setIsApiLimited,
+  setApiErrorMsg,
+  setResetTime,
+} from "../../state/booleanslice";
 
 const breakpointColumsObj = {
   default: 4,
@@ -63,11 +68,19 @@ function ResultBody() {
         if (!isCancelled) {
           const array = response.data.photosArray;
           const moreImages = response.data.itHasMore;
+
           dispatch(setPhotoArray(array));
           dispatch(isLoading(false));
           setItHasMore(moreImages);
         }
       } catch (error) {
+        if (error.response.status === 429) {
+          const { message, resetTime, apiReached } = error.response.data;
+          dispatch(setApiErrorMsg(message));
+          dispatch(setIsApiLimited(apiReached));
+          dispatch(setResetTime(resetTime));
+        }
+
         if (!isCancelled)
           console.error("Unable to get backend message:", error);
       }
