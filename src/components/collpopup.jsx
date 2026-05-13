@@ -26,6 +26,8 @@ function ColPopUp(params) {
   const show = useSelector((state) => state.boolean.value3);
   const photoIndex = useSelector((state) => state.index.value);
   const notificationTimer = useRef(null);
+  const inp = useSelector((state) => state.text.inputcol);
+
 
   function hide() {
     dispatch(setAddState(false));

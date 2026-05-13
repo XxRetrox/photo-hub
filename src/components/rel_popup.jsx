@@ -21,6 +21,8 @@ function RelPopUp(params) {
   const show = useSelector((state) => state.boolean.value);
   const photoIndex = useSelector((state) => state.index.value);
   const notificationTimer = useRef(null);
+  const inp = useSelector((state) => state.text.inputcol);
+
 
   function hide() {
     dispatch(isTrue(false));
