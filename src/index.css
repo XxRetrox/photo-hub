@@ -929,12 +929,24 @@ strong {
     height: 20px;
     border-radius: 20px;
     padding: 8px 8px;
+    border: 1px solid rgba(164, 55, 176, 0.241);
   }
   .footer-grid {
     gap: 10px;
   }
   .img-con {
     width: 90%;
+  }
+  .navbar .bar {
+    font-size: 1.1rem;
+    padding: 0.1rem;
+    text-align: center;
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+  .opt button {
+    font-size: 1.5rem;
+    background-color: rgb(250, 224, 255);
   }
 }
 
@@ -946,16 +958,9 @@ strong {
   .search-bnt::placeholder {
     font-size: 0.75rem;
   }
-  .navbar .bar {
-    font-size: 0.8rem;
-    padding: 0.1rem;
-    text-align: center;
-    padding-top: 5px;
-    padding-bottom: 5px;
-  }
   .bnt {
-    height: 1.8rem;
-    width: 3.3rem;
+    height: 2.1rem;
+    width: 3.7rem;
     font-size: 0.55rem;
   }
   .bnt:hover {
