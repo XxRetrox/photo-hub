@@ -945,8 +945,8 @@ strong {
     padding-bottom: 5px;
   }
   .opt button {
-    font-size: 1.5rem;
-    background-color: rgb(250, 224, 255);
+    font-size: 1.1rem;
+    background-color: rgba(254, 248, 255, 0.581);
   }
 }
 
@@ -960,8 +960,8 @@ strong {
   }
   .bnt {
     height: 2.1rem;
-    width: 3.7rem;
-    font-size: 0.55rem;
+    width: 3.8rem;
+    font-size: 0.85rem;
   }
   .bnt:hover {
     height: 1.9rem;
